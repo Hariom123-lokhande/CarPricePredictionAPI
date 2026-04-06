@@ -1,0 +1,562 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="main-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fa-solid fa-car-side"></i>
+            </div>
+            <div class="logo-text">
+                <h1>CarPrice <span>AI</span></h1>
+                <p>Advanced Estimator</p>
+            </div>
+        </div>
+
+        <div class="side-nav">
+            <a class="nav-item active" href="#section-upload">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Upload Data</span>
+            </a>
+            <a class="nav-item" href="#section-train">
+                <i class="fa-solid fa-microchip"></i>
+                <span>Train Model</span>
+            </a>
+            <a class="nav-item" href="#section-predict">
+                <i class="fa-solid fa-calculator"></i>
+                <span>Predict Price</span>
+            </a>
+            <a class="nav-item" href="#section-inventory">
+                <i class="fa-solid fa-database"></i>
+                <span>Master Inventory</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="nav-item" onclick="handleLogout()">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Sign Out</span>
+            </div>
+            <div class="status-indicator">
+                <div class="dot green"></div>
+                AI Engine Online
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content - Single Page -->
+    <div class="content-area">
+
+        <!-- Page Header -->
+        <div class="view-header" style="margin-bottom: 3rem;">
+            <h2>CarPrice AI Dashboard</h2>
+            <p>Follow the steps below: upload your dataset, train the model, then predict car prices instantly.</p>
+        </div>
+
+        <!-- ===== STEP 1: Upload ===== -->
+        <div id="section-upload" style="margin-bottom: 2.5rem;">
+            <div class="step-label">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Upload Dataset</strong>
+                    <span style="color: var(--text-muted); font-size: 0.9rem; margin-left: 0.5rem;">Upload your CSV file to begin</span>
+                </div>
+            </div>
+            <div class="glass-card" style="padding: 2rem;">
+                <input type="file" id="fileInput" style="display:none" accept=".csv" onchange="uploadData()" />
+                <div class="upload-container" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem;">Click to Browse CSV File</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
+                        Required columns: Brand, Year, Mileage, Fuel, Transmission, Price
+                    </p>
+                    <div id="uploadStatus" style="font-weight:600; color: var(--primary);">
+                        <i class="fa-solid fa-file-csv"></i> Waiting for dataset...
+                    </div>
+                    <div id="trainInfo" style="font-weight:600; color:var(--primary); margin-top:6px; font-size:0.9rem;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 2: Train ===== -->
+        <div id="section-train" style="margin-bottom: 2.5rem;">
+            <div class="step-label">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Train Model</strong>
+                    <span style="color: var(--text-muted); font-size: 0.9rem; margin-left: 0.5rem;">Choose algorithm and synthesize your AI model</span>
+                </div>
+            </div>
+            <div class="glass-card" style="padding: 2rem;">
+                <div style="display:flex; gap: 1rem; align-items:center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <div class="input-wrapper" style="flex:1; min-width: 200px;">
+                        <i class="fa-solid fa-microchip"></i>
+                        <select id="algorithm">
+                            <option value="COMPARE">⭐ Compare Both Engines (SDCA + FastTree)</option>
+                            <option value="SDCA">SDCA Linear Solver</option>
+                            <option value="FASTTREE">FastTree Decision Engine</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" id="trainBtn" onclick="trainModel()" style="white-space:nowrap;">
+                        <span>Synthesize Model</span>
+                        <i class="fa-solid fa-bolt"></i>
+                    </button>
+                </div>
+
+                <!-- Success Status -->
+                <div id="trainStats" style="display:none; text-align:center; padding: 2rem; background: rgba(16,185,129,0.1); border-radius:1rem; border:1px solid rgba(16,185,129,0.2);">
+                   <div style="color:#10b981; font-size: 1.25rem; font-weight:700;">
+                       <i class="fa-solid fa-check-circle" style="margin-right:8px;"></i>
+                       Model Training Successful
+                   </div>
+                   <p style="color:var(--text-muted); margin-top:0.5rem;">All algorithms have been synthesized on the dataset.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 3: Predict ===== -->
+        <div id="section-predict" style="margin-bottom: 2.5rem;">
+            <!-- ... same as before but keeping it for context ... -->
+            <div class="step-label">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Predict Car Price</strong>
+                    <span style="color: var(--text-muted); font-size: 0.9rem; margin-left: 0.5rem;">Enter car details below</span>
+                </div>
+            </div>
+            <div class="glass-card" style="padding: 2rem;">
+                <!-- Form code ... -->
+                <div class="grid-form">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Brand / Manufacturer</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-tag"></i>
+                                <select id="brand" required>
+                                    <option value="" disabled selected>Select Brand</option>
+                                    <option value="Hyundai">Hyundai</option>
+                                    <option value="Maruti">Maruti</option>
+                                    <option value="Honda">Honda</option>
+                                    <option value="Tata">Tata</option>
+                                    <option value="Mahindra">Mahindra</option>
+                                    <option value="Toyota">Toyota</option>
+                                    <option value="Kia">Kia</option>
+                                    <option value="BMW">BMW</option>
+                                    <option value="Audi">Audi</option>
+                                </select>
+                            </div>
+                            <div id="brandError" style="color:#ef4444; font-size:0.8rem; margin-top:4px; display:none;"></div>
+                        </div>
+                        <div class="input-group">
+                            <label>Manufacturing Year</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                <input type="number" id="year" placeholder="e.g. 2022" value="2022" min="2000" max="2026" required>
+                            </div>
+                            <div id="yearError" style="color:#ef4444; font-size:0.8rem; margin-top:4px; display:none;">Enter a valid manufacturing year (2000–2026)</div>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Total Mileage (KM)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-gauge-high"></i>
+                                <input type="number" id="mileage" placeholder="e.g. 45000" min="0" max="200000" required>
+                            </div>
+                            <div id="mileageError" style="color:#ef4444; font-size:0.8rem; margin-top:4px; display:none;">Please enter realistic mileage (0 – 200,000 km)</div>
+                        </div>
+                        <div class="input-group">
+                            <label>Fuel Type</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-gas-pump"></i>
+                                <select id="fuel" required>
+                                    <option value="" disabled selected>Select Fuel</option>
+                                    <option value="Petrol">Petrol</option>
+                                    <option value="Diesel">Diesel</option>
+                                </select>
+                            </div>
+                            <div id="fuelError" style="color:#ef4444; font-size:0.8rem; margin-top:4px; display:none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Transmission</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-gears"></i>
+                                <select id="transmission">
+                                    <option value="Manual">Manual</option>
+                                    <option value="Automatic">Automatic</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" id="predictBtn" onclick="predictPrice()" style="width:100%; margin-top: 0.5rem;">
+                        <span>Calculate Valuation</span>
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </button>
+                </div>
+
+                <!-- Result -->
+                <div id="result" style="display:none; margin-top: 2rem; animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        
+                        <!-- SDCA Card -->
+                        <div class="result-card" style="background: linear-gradient(145deg, rgba(99,102,241,0.1), rgba(99,102,241,0.02)); border: 1px solid rgba(99,102,241,0.2); padding: 1.5rem; border-radius: 1.25rem; text-align: center; transition: transform 0.3s ease;">
+                            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items:center; justify-content:center; margin: 0 auto 1rem; color: white; box-shadow: 0 4px 12px rgba(99,102,241,0.3);">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <h4 style="color:var(--primary); text-transform:uppercase; font-size:0.75rem; letter-spacing:1.5px; font-weight:800; margin-bottom:1rem;">SDCA Linear Engine</h4>
+                            <div style="font-size: 1.85rem; font-weight:800; color: var(--text-main); margin-bottom:0.5rem; letter-spacing: -0.5px;"><span id="sdcaPrice">₹0</span></div>
+                            <div style="display: inline-block; padding: 0.4rem 1rem; background: rgba(16,185,129,0.1); border-radius: 2rem; color: #10b981; font-weight: 700; font-size: 0.85rem;">
+                                <i class="fa-solid fa-shield-heart" style="margin-right: 5px;"></i> <span id="sdcaStatus">-</span>
+                            </div>
+                        </div>
+
+                        <!-- FastTree Card -->
+                        <div class="result-card" style="background: linear-gradient(145deg, rgba(168,85,247,0.1), rgba(168,85,247,0.02)); border: 1px solid rgba(168,85,247,0.2); padding: 1.5rem; border-radius: 1.25rem; text-align: center; transition: transform 0.3s ease;">
+                            <div style="width: 40px; height: 40px; background: var(--secondary); border-radius: 10px; display: flex; align-items:center; justify-content:center; margin: 0 auto 1rem; color: white; box-shadow: 0 4px 12px rgba(168,85,247,0.3);">
+                                <i class="fa-solid fa-tree-city"></i>
+                            </div>
+                            <h4 style="color:var(--secondary); text-transform:uppercase; font-size:0.75rem; letter-spacing:1.5px; font-weight:800; margin-bottom:1rem;">FastTree Decision Engine</h4>
+                            <div style="font-size: 1.85rem; font-weight:800; color: var(--text-main); margin-bottom:0.5rem; letter-spacing: -0.5px;"><span id="ftPrice">₹0</span></div>
+                            <div style="display: inline-block; padding: 0.4rem 1rem; background: rgba(168,85,247,0.1); border-radius: 2rem; color: var(--secondary); font-weight: 700; font-size: 0.85rem;">
+                                <i class="fa-solid fa-gem" style="margin-right: 5px;"></i> <span id="ftStatus">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Insight Box -->
+                    <div style="position: relative; padding: 1.5rem; background: rgba(0,0,0,0.02); border-radius: 1rem; border: 1px dashed rgba(0,0,0,0.1); overflow: hidden;">
+                        <div style="position: absolute; top:0; left:0; width:4px; height:100%; background: linear-gradient(to bottom, var(--primary), var(--secondary));"></div>
+                        <h5 style="color: var(--text-main); margin-bottom: 0.5rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-circle-info" style="color: var(--primary);"></i>
+                            Model Comparison Insight
+                        </h5>
+                        <p style="color: var(--text-muted); font-size:0.85rem; line-height: 1.6; margin: 0;">
+                            SDCA provides faster training and prediction due to its linear approach and low computational cost, making it ideal for real-time scenarios, while FastTree is slower as it constructs multiple decision trees but can model more complex, non-linear relationships.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 4: Inventory (DB Showcase) ===== -->
+        <div id="section-inventory" style="margin-bottom: 2.5rem;">
+            <div class="step-label">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Master Inventory (Database)</strong>
+                    <span style="color: var(--text-muted); font-size: 0.9rem; margin-left: 0.5rem;">Live records fetched directly from SQL DB</span>
+                </div>
+            </div>
+            <div class="glass-card" style="padding: 1.5rem;">
+                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 1rem;">
+                    <h4 style="font-size: 1rem; color: var(--text-main);">Training Data Records</h4>
+                    <button class="btn-primary" onclick="loadInventory()" style="padding: 0.5rem 1rem; font-size: 0.8rem; width: auto !important;">
+                        <i class="fa-solid fa-rotate"></i> Refresh DB
+                    </button>
+                </div>
+                <div style="overflow-x: auto; border-radius: 0.75rem; border: 1px solid rgba(0,0,0,0.05);">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                        <thead style="background: rgba(0,0,0,0.02); color: var(--text-muted); font-weight: 700;">
+                            <tr>
+                                <th style="padding: 1rem;">Brand</th>
+                                <th style="padding: 1rem;">Year</th>
+                                <th style="padding: 1rem;">Mileage</th>
+                                <th style="padding: 1rem;">Fuel</th>
+                                <th style="padding: 1rem;">Price</th>
+                                <th style="padding: 1rem;">Uploaded At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryBody" style="color: var(--text-main);">
+                            <tr>
+                                <td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading records...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .step-label {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+        .step-number {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+        }
+        .side-nav .nav-item {
+            text-decoration: none;
+        }
+        .content-area {
+            max-width: 860px;
+        }
+        .view-section { display: block !important; }
+        
+        @@keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.06) !important;
+            border-color: rgba(255,255,255,0.3) !important;
+        }
+    </style>
+    <script>
+        // Smooth scroll highlight for sidebar
+        const sections = ['section-upload','section-train','section-predict', 'section-inventory'];
+        const navLinks = document.querySelectorAll('.side-nav .nav-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && window.scrollY >= el.offsetTop - 120) current = id;
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+            });
+        });
+
+        // Initialize upload & training status on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshStatus();
+            loadInventory();
+        });
+
+        async function loadInventory() {
+            const body = document.getElementById('inventoryBody');
+            try {
+                const res = await fetch('/api/carprice/inventory');
+                if (!res.ok) return;
+                const data = await res.json();
+                
+                if (data.length === 0) {
+                    body.innerHTML = '<tr><td colspan="6" style="padding:2rem; text-align:center; color:var(--text-muted);">No records found in database. Please upload a CSV.</td></tr>';
+                    return;
+                }
+
+                body.innerHTML = '';
+                data.forEach(item => {
+                    const row = `
+                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.03);">
+                            <td style="padding: 0.8rem 1rem; font-weight:600;">${item.brand}</td>
+                            <td style="padding: 0.8rem 1rem;">${item.year}</td>
+                            <td style="padding: 0.8rem 1rem;">${item.mileage.toLocaleString()} KM</td>
+                            <td style="padding: 0.8rem 1rem;">${item.fuel}</td>
+                            <td style="padding: 0.8rem 1rem; font-weight:700; color: var(--primary);">₹${item.price.toLocaleString('en-IN')}</td>
+                            <td style="padding: 0.8rem 1rem; color: var(--text-muted); font-size:0.75rem;">${new Date(item.uploadedAt).toLocaleString()}</td>
+                        </tr>
+                    `;
+                    body.innerHTML += row;
+                });
+            } catch (e) { 
+                body.innerHTML = '<tr><td colspan="6" style="padding:2rem; text-align:center; color:#ef4444;">Error fetching from database.</td></tr>';
+            }
+        }
+
+        async function refreshHistory() {
+            try {
+                const res = await fetch('/api/carprice/history');
+                if (!res.ok) return;
+                const data = await res.json();
+                const body = document.getElementById('historyBody');
+                body.innerHTML = '';
+                
+                data.forEach(item => {
+                    const row = `
+                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.03);">
+                            <td style="padding: 0.8rem 0.5rem;">${item.brand}</td>
+                            <td style="padding: 0.8rem 0.5rem;">${item.year}</td>
+                            <td style="padding: 0.8rem 0.5rem;">${item.fuel}</td>
+                            <td style="padding: 0.8rem 0.5rem; color: var(--primary); font-weight: 700;">₹${Math.round(item.priceSDCA).toLocaleString('en-IN')}</td>
+                            <td style="padding: 0.8rem 0.5rem; color: var(--secondary); font-weight: 700;">₹${Math.round(item.priceFastTree).toLocaleString('en-IN')}</td>
+                            <td style="padding: 0.8rem 0.5rem; font-size: 0.8rem; color: var(--text-muted);">${new Date(item.predictedAt).toLocaleDateString()} <span style="font-size:0.7rem; opacity:0.7;">${new Date(item.predictedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span></td>
+                        </tr>
+                    `;
+                    body.insertRow().innerHTML = row;
+                });
+            } catch (e) { console.warn('History fetch failed', e); }
+        }
+
+        async function refreshStatus() {
+            const statusEl = document.getElementById('uploadStatus');
+            const trainInfoEl = document.getElementById('trainInfo');
+            statusEl.style.color = 'var(--primary)';
+            statusEl.innerHTML = `<i class="fa-solid fa-file-csv"></i> Waiting for dataset...`;
+            trainInfoEl.innerHTML = '';
+
+            try {
+                const r = await fetch('/api/carprice/status');
+                if (!r.ok) return;
+                const j = await r.json();
+                if (j && j.upload) {
+                    let fileName = j.upload.fileName || (typeof j.upload === 'string' ? j.upload : null);
+                    if (fileName) {
+                        statusEl.innerHTML = `<i class="fa-solid fa-check-circle" style="color:green; margin-right:6px;"></i> Uploaded: ${fileName}`;
+                        localStorage.setItem('uploadedFileName', fileName);
+                    }
+                }
+                if (j && j.trained) {
+                    // show basic trained info
+                    try {
+                        const t = j.trained;
+                        let trainedAt = t.trainedAt || t.trainedAt;
+                        let algo = t.algorithm || (t.metrics ? (t.algorithm || 'SDCA') : 'SDCA');
+                        // if nested (COMPARE), show both
+                        if (t.algorithm === 'COMPARE' && t.sdca) {
+                            trainInfoEl.innerHTML = `Last trained: ${t.algorithm} at ${trainedAt ? new Date(trainedAt).toLocaleString() : ''}`;
+                        } else if (t.algorithm) {
+                            trainInfoEl.innerHTML = `Last trained: ${t.algorithm} at ${trainedAt ? new Date(trainedAt).toLocaleString() : ''}`;
+                        }
+                    } catch (ex) { /* ignore */ }
+                }
+            } catch (e) {
+                console.warn('Failed to fetch status', e);
+            }
+        }
+
+        // Trigger training on server and update UI with a success message
+        async function trainModel() {
+            const algo = document.getElementById('algorithm').value;
+            const trainBtn = document.getElementById('trainBtn');
+            const trainStats = document.getElementById('trainStats');
+
+            trainBtn.disabled = true;
+            trainBtn.innerHTML = 'Training... <i class="fa-solid fa-spinner fa-spin"></i>';
+
+            try {
+                const res = await fetch('/api/carprice/train?algorithm=' + encodeURIComponent(algo), { method: 'POST' });
+                if (!res.ok) {
+                    let err = await res.text();
+                    try { const j = JSON.parse(err); err = j.error || j.message || err; } catch {}
+                    alert('Training failed: ' + err);
+                    return;
+                }
+
+                // Show success status
+                if (trainStats) trainStats.style.display = 'block';
+
+                // Persist last trained info to localStorage and refresh server status
+                localStorage.setItem('lastTrained', new Date().toISOString());
+                try { await refreshStatus(); } catch { }
+            }
+            catch (err) {
+                console.error(err);
+                alert('Training error: ' + err.message);
+            }
+            finally {
+                trainBtn.disabled = false;
+                trainBtn.innerHTML = '<span>Synthesize Model</span> <i class="fa-solid fa-bolt"></i>';
+            }
+        }
+
+        // Call prediction API and show result
+        async function predictPrice() {
+            const brand = document.getElementById('brand').value;
+            const year = Number(document.getElementById('year').value);
+            const mileage = Number(document.getElementById('mileage').value);
+            const fuel = document.getElementById('fuel').value;
+            const transmission = document.getElementById('transmission').value;
+
+            const payload = { Brand: brand, Year: year, Mileage: mileage, Fuel: fuel, Transmission: transmission };
+            try {
+                const res = await fetch('/api/carprice/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    let err = await res.text();
+                    try { const j = JSON.parse(err); err = j.error || j.message || err; } catch {}
+                    alert('Prediction failed: ' + err);
+                    return;
+                }
+
+                const json = await res.json();
+                
+                // Set SDCA Results
+                document.getElementById('sdcaPrice').innerText = json.sdca.priceFormatted;
+                document.getElementById('sdcaStatus').innerText = json.sdca.dealStatus;
+
+                // Set FastTree Results
+                document.getElementById('ftPrice').innerText = json.fastTree.priceFormatted;
+                document.getElementById('ftStatus').innerText = json.fastTree.dealStatus;
+
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            catch (err) {
+                console.error(err);
+                alert('Prediction error: ' + err.message);
+            }
+        }
+
+        // Called when user selects a file
+        async function uploadData() {
+            const input = document.getElementById('fileInput');
+            const file = input.files[0];
+            const statusEl = document.getElementById('uploadStatus');
+            if (!file) return;
+
+            statusEl.style.color = 'var(--primary)';
+            statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading ${file.name}...`;
+
+            try {
+                const fd = new FormData();
+                fd.append('file', file);
+
+                const res = await fetch('/api/carprice/upload', { method: 'POST', body: fd });
+                if (!res.ok) {
+                    let errText = await res.text();
+                    try { const j = JSON.parse(errText); errText = j.error || j.message || errText; } catch { }
+                    statusEl.style.color = '#ef4444';
+                    statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Upload failed: ${errText}`;
+                    return;
+                }
+
+                const json = await res.json();
+                statusEl.style.color = 'var(--primary)';
+                statusEl.innerHTML = `<i class="fa-solid fa-check-circle" style="color:green; margin-right:6px;"></i> Uploaded: ${file.name}`;
+                localStorage.setItem('uploadedFileName', file.name);
+                loadInventory(); // Refresh DB view after upload
+            }
+            catch (err) {
+                console.error(err);
+                statusEl.style.color = '#ef4444';
+                statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Upload error`;
+            }
+        }
+    </script>
+}
