@@ -200,7 +200,7 @@ namespace CarPricePredictionAPI.Controllers
         {
             var data = _db.CarInventories
                 .OrderByDescending(i => i.UploadedAt)
-                .Take(50) // Show last 50 for performance
+                .Take(10) // Show last 10 
                 .ToList();
             return Ok(data);
         }
