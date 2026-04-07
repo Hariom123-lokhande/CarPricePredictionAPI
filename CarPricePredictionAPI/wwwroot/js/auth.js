@@ -1,4 +1,5 @@
 async function login() {
+    debugger;
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
     const res = await fetch('/api/auth/login', {

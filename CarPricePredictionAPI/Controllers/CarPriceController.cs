@@ -40,8 +40,8 @@ namespace CarPricePredictionAPI.Controllers
         {
             try
             {
-                var uploaded = System.IO.File.Exists(_uploadedMarkerPath) 
-                    ? System.Text.Json.JsonSerializer.Deserialize<object>(System.IO.File.ReadAllText(_uploadedMarkerPath)) 
+                var uploaded = System.IO.File.Exists(_uploadedMarkerPath)
+                    ? System.Text.Json.JsonSerializer.Deserialize<object>(System.IO.File.ReadAllText(_uploadedMarkerPath))
                     : (object?)null;
 
                 var lastTrained = (object?)_db.ModelMetadatas
@@ -56,12 +56,12 @@ namespace CarPricePredictionAPI.Controllers
             }
         }
 
-       [HttpGet("Dashboard")]
-       [ApiExplorerSettings(IgnoreApi = true)]
-       public IActionResult Dashboard()
-       {
+        [HttpGet("Dashboard")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public IActionResult Dashboard()
+        {
             return View();
-       }
+        }
 
         [HttpGet("api/carprice/history")]
         public IActionResult GetHistory()
@@ -133,20 +133,23 @@ namespace CarPricePredictionAPI.Controllers
                         {
                             await uploadReader.ReadLineAsync(); // Skip header
                         }
-                        
+
                         string? line;
                         while ((line = await uploadReader.ReadLineAsync()) != null)
                         {
                             if (string.IsNullOrWhiteSpace(line)) continue;
-                            
+
                             // 1. Write to CSV File
                             await writer.WriteLineAsync(line);
 
                             // 2. Parsed for Database (SQL) saving
-                            try {
+                            try
+                            {
                                 var parts = line.Split(',');
-                                if (parts.Length >= 6) {
-                                    var inv = new CarInventory {
+                                if (parts.Length >= 6)
+                                {
+                                    var inv = new CarInventory
+                                    {
                                         Brand = parts[0].Trim(),
                                         Year = int.Parse(parts[1].Trim()),
                                         Mileage = float.Parse(parts[2].Trim()),
@@ -157,7 +160,8 @@ namespace CarPricePredictionAPI.Controllers
                                     };
                                     _db.CarInventories.Add(inv);
                                 }
-                            } catch { /* skip malformed line for DB */ }
+                            }
+                            catch { /* skip malformed line for DB */ }
                         }
                     }
                     await _db.SaveChangesAsync();
@@ -379,7 +383,7 @@ namespace CarPricePredictionAPI.Controllers
                 var allowedBrands = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Hyundai", "Maruti", "Honda", "Tata", "Mahindra", "Toyota", "Kia", "BMW", "Audi" };
                 if (string.IsNullOrWhiteSpace(input.Brand) || !allowedBrands.Contains(input.Brand))
                     return BadRequest(new { error = "Invalid brand selected." });
-                
+
                 if (input.Year < 2000 || input.Year > DateTime.Now.Year)
                     return BadRequest(new { error = "Enter a valid manufacturing year." });
 
@@ -396,7 +400,7 @@ namespace CarPricePredictionAPI.Controllers
 
                 var predictionSdca = _engine.Predict(input, "SDCA");
                 var predictionFt = _engine.Predict(input, "FASTTREE");
-                
+
                 // Remove floor or make it very low to see real output during debug
                 if (predictionSdca.PredictedPrice < 10000) predictionSdca.PredictedPrice = 10000;
                 if (predictionFt.PredictedPrice < 10000) predictionFt.PredictedPrice = 10000;
@@ -434,11 +438,13 @@ namespace CarPricePredictionAPI.Controllers
 
                 return Ok(new
                 {
-                    sdca = new {
+                    sdca = new
+                    {
                         priceFormatted = "₹" + predictionSdca.PredictedPrice.ToString("N0"),
                         dealStatus = statusSdca
                     },
-                    fastTree = new {
+                    fastTree = new
+                    {
                         priceFormatted = "₹" + predictionFt.PredictedPrice.ToString("N0"),
                         dealStatus = statusFt
                     }

@@ -28,10 +28,6 @@
                 <i class="fa-solid fa-calculator"></i>
                 <span>Predict Price</span>
             </a>
-            <a class="nav-item" href="#section-inventory">
-                <i class="fa-solid fa-database"></i>
-                <span>Master Inventory</span>
-            </a>
         </div>
 
         <div class="sidebar-footer">
@@ -247,44 +243,6 @@
             </div>
         </div>
 
-        <!-- ===== STEP 4: Inventory (DB Showcase) ===== -->
-        <div id="section-inventory" style="margin-bottom: 2.5rem;">
-            <div class="step-label">
-                <div class="step-number">4</div>
-                <div>
-                    <strong>Master Inventory (Database)</strong>
-                    <span style="color: var(--text-muted); font-size: 0.9rem; margin-left: 0.5rem;">Live records fetched directly from SQL DB</span>
-                </div>
-            </div>
-            <div class="glass-card" style="padding: 1.5rem;">
-                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 1rem;">
-                    <h4 style="font-size: 1rem; color: var(--text-main);">Training Data Records</h4>
-                    <button class="btn-primary" onclick="loadInventory()" style="padding: 0.5rem 1rem; font-size: 0.8rem; width: auto !important;">
-                        <i class="fa-solid fa-rotate"></i> Refresh DB
-                    </button>
-                </div>
-                <div style="overflow-x: auto; border-radius: 0.75rem; border: 1px solid rgba(0,0,0,0.05);">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
-                        <thead style="background: rgba(0,0,0,0.02); color: var(--text-muted); font-weight: 700;">
-                            <tr>
-                                <th style="padding: 1rem;">Brand</th>
-                                <th style="padding: 1rem;">Year</th>
-                                <th style="padding: 1rem;">Mileage</th>
-                                <th style="padding: 1rem;">Fuel</th>
-                                <th style="padding: 1rem;">Price</th>
-                                <th style="padding: 1rem;">Uploaded At</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventoryBody" style="color: var(--text-main);">
-                            <tr>
-                                <td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-muted);">
-                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading records...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -334,7 +292,7 @@
     </style>
     <script>
         // Smooth scroll highlight for sidebar
-        const sections = ['section-upload','section-train','section-predict', 'section-inventory'];
+        const sections = ['section-upload','section-train','section-predict'];
         const navLinks = document.querySelectorAll('.side-nav .nav-item');
 
         window.addEventListener('scroll', () => {
@@ -352,63 +310,11 @@
         // Initialize upload & training status on page load
         document.addEventListener('DOMContentLoaded', () => {
             refreshStatus();
-            loadInventory();
         });
 
-        async function loadInventory() {
-            const body = document.getElementById('inventoryBody');
-            try {
-                const res = await fetch('/api/carprice/inventory');
-                if (!res.ok) return;
-                const data = await res.json();
-                
-                if (data.length === 0) {
-                    body.innerHTML = '<tr><td colspan="6" style="padding:2rem; text-align:center; color:var(--text-muted);">No records found in database. Please upload a CSV.</td></tr>';
-                    return;
-                }
 
-                body.innerHTML = '';
-                data.forEach(item => {
-                    const row = `
-                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.03);">
-                            <td style="padding: 0.8rem 1rem; font-weight:600;">${item.brand}</td>
-                            <td style="padding: 0.8rem 1rem;">${item.year}</td>
-                            <td style="padding: 0.8rem 1rem;">${item.mileage.toLocaleString()} KM</td>
-                            <td style="padding: 0.8rem 1rem;">${item.fuel}</td>
-                            <td style="padding: 0.8rem 1rem; font-weight:700; color: var(--primary);">₹${item.price.toLocaleString('en-IN')}</td>
-                            <td style="padding: 0.8rem 1rem; color: var(--text-muted); font-size:0.75rem;">${new Date(item.uploadedAt).toLocaleString()}</td>
-                        </tr>
-                    `;
-                    body.innerHTML += row;
-                });
-            } catch (e) { 
-                body.innerHTML = '<tr><td colspan="6" style="padding:2rem; text-align:center; color:#ef4444;">Error fetching from database.</td></tr>';
-            }
-        }
 
-        async function refreshHistory() {
-            try {
-                const res = await fetch('/api/carprice/history');
-                if (!res.ok) return;
-                const data = await res.json();
-                const body = document.getElementById('historyBody');
-                body.innerHTML = '';
-                
-                data.forEach(item => {
-                    const row = `
-                        <tr style="border-bottom: 1px solid rgba(0,0,0,0.03);">
-                            <td style="padding: 0.8rem 0.5rem;">${item.brand}</td>
-                            <td style="padding: 0.8rem 0.5rem;">${item.year}</td>
-                            <td style="padding: 0.8rem 0.5rem;">${item.fuel}</td>
-                            <td style="padding: 0.8rem 0.5rem; color: var(--primary); font-weight: 700;">₹${Math.round(item.priceSDCA).toLocaleString('en-IN')}</td>
-                            <td style="padding: 0.8rem 0.5rem; color: var(--secondary); font-weight: 700;">₹${Math.round(item.priceFastTree).toLocaleString('en-IN')}</td>
-                            <td style="padding: 0.8rem 0.5rem; font-size: 0.8rem; color: var(--text-muted);">${new Date(item.predictedAt).toLocaleDateString()} <span style="font-size:0.7rem; opacity:0.7;">${new Date(item.predictedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span></td>
-                        </tr>
-                    `;
-                    body.insertRow().innerHTML = row;
-                });
-            } catch (e) { console.warn('History fetch failed', e); }
-        }
+
 
         async function refreshStatus() {
             const statusEl = document.getElementById('uploadStatus');
@@ -550,7 +456,6 @@
                 statusEl.style.color = 'var(--primary)';
                 statusEl.innerHTML = `<i class="fa-solid fa-check-circle" style="color:green; margin-right:6px;"></i> Uploaded: ${file.name}`;
                 localStorage.setItem('uploadedFileName', file.name);
-                loadInventory(); // Refresh DB view after upload
             }
             catch (err) {
                 console.error(err);

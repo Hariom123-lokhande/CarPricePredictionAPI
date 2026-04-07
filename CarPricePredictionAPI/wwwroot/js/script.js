@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initAuthForms() {
-    debugger;
+    //debugger;
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
 
@@ -93,7 +93,7 @@ function initAuthForms() {
     }
 
     if (signupForm) {
-        debugger;
+        //debugger;
         signupForm.onsubmit = async (e) => {
             e.preventDefault();
             const btn = signupForm.querySelector('button[type="submit"]');
@@ -151,7 +151,7 @@ function initAuthForms() {
 
 
 async function predictPrice() {
-    debugger;
+    //debugger;
     const btn = document.getElementById('predictBtn');
     const resultDiv = document.getElementById('result');
     const priceDisplay = document.getElementById('predictedPrice');
@@ -207,6 +207,7 @@ async function predictPrice() {
 }
 
 async function uploadData() {
+    //debugger;
     const fileInput = document.getElementById('fileInput');
     const status = document.getElementById('uploadStatus');
     const file = fileInput.files[0];
@@ -235,6 +236,7 @@ async function uploadData() {
 }
 
 async function trainModel() {
+    //debugger;
     const btn = document.getElementById('trainBtn');
     const stats = document.getElementById('trainStats');
     const algo = document.getElementById('algorithm').value;
